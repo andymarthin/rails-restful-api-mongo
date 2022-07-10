@@ -1,0 +1,37 @@
+version: '3'
+services:
+  db:
+    image: mongo:4.4.15
+    container_name: mongodb
+    restart: always
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - backend
+  web:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: rails_api_app
+    volumes:
+      - .:/app
+      - bundler_gems:/usr/local/bundle/
+    ports:
+      - 3000:3000
+    env_file: .env
+    environment:
+      MONGODB_URI: mongodb://db:27017/rails_api_mongodb_development
+    depends_on:
+      - db
+    networks:
+      - backend
+    stdin_open: true
+    tty: true
+
+networks:
+  backend:
+volumes:
+  mongodb_data:
+  bundler_gems:
